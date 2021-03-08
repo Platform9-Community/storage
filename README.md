@@ -18,5 +18,5 @@ CSI with Rook and Ceph on Platform9 Managed Kubernetes Freedom Plan
 ### kasten
 Backup and Restore Kubernetes stateful/stateless applications using Kasten
 
-###
+### velero
 Backup and restore kubernetes namespaces using Velero on Platform9 Managed Kubernetes (PMK)
