@@ -20,3 +20,6 @@ Backup and Restore Kubernetes stateful/stateless applications using Kasten
 
 ### velero
 Backup and restore kubernetes namespaces using Velero on Platform9 Managed Kubernetes (PMK)
+
+### cinder-csi
+CSI with cinder-csi on Platform9 Managed Kubernetes (PMK) Clusters runnin on Openstack/PMO clouds.
