@@ -70,7 +70,7 @@ After verifying that NFS is confgured correctly and working we can un-mount the 
 Next, we’ll configure a service account and role bindings. We’ll use role-based access control to do the configuration. First step is to download the nfs-provisioning repo and change into the nfs-provisioning directory.
 
 ```
-git clone https://github.com/KoolKubernetes/storage.git
+git clone https://github.com/Platform9-Community/storage.git
 
 cd nfs-provisioning
 ```
@@ -257,7 +257,10 @@ Also, we can look in the directory we allocated for Persistent Volumes and see t
 
 ```
 [root@cluster-50-master]# ls /srv/nfs/kubedata/
+```
+   
 Let’s create a PVC. Inside the nfs-provisioning repo there is a file “4-pvc-nfs.yaml”. In this example, we will allocate 500 MegaBytes.
+```
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
