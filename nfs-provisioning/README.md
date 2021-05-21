@@ -260,6 +260,7 @@ Also, we can look in the directory we allocated for Persistent Volumes and see t
 ```
    
 Let’s create a PVC. Inside the nfs-provisioning repo there is a file “4-pvc-nfs.yaml”. In this example, we will allocate 500 MegaBytes.
+
 ```
 apiVersion: v1
 kind: PersistentVolumeClaim
