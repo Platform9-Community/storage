@@ -4,7 +4,7 @@
 - Linux Work Station
 - K8 Cluster
 - Kubernetes-cli or kubectl program
-- Kubernetes version v1.17.1 (any version should work)
+- Kubernetes versions 1.19.6 - 1.20.5 (other versions have **not** been verified)
 - Routable IP network with DHCP configured
 
 ### Step 1) Installing the NFS Server
@@ -195,8 +195,7 @@ Controlled By:  ReplicaSet/nfs-client-provisioner-67dfcbfd99
 Containers:
   nfs-client-provisioner:
     Container ID:   docker://6a94fd212535c703ff7f8bdf5063745c9c149c91663ccf5a6888adc286bb3507
-    Image:          quay.io/external_storage/nfs-client-provisioner:latest
-    Image ID:       docker-pullable://quay.io/external_storage/nfs-client-provisioner@sha256:022ea0b0d69834b652a4c53655d78642ae23f0324309097be874fb58d09d2919
+    Image:          k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
     Port:           <none>
     Host Port:      <none>
     State:          Running
@@ -234,8 +233,8 @@ Events:
   Type    Reason     Age        From                    Message
   ----    ------     ----       ----                    -------
   Normal  Scheduled  <unknown>  default-scheduler       Successfully assigned default/nfs-client-provisioner-67dfcbfd99-wc9zb to 192.168.50.14
-  Normal  Pulling    59m        kubelet, 192.168.50.14  Pulling image "quay.io/external_storage/nfs-client-provisioner:latest"
-  Normal  Pulled     59m        kubelet, 192.168.50.14  Successfully pulled image "quay.io/external_storage/nfs-client-provisioner:latest"
+  Normal  Pulling    59m        kubelet, 192.168.50.14  Pulling image "k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2"
+  Normal  Pulled     59m        kubelet, 192.168.50.14  Successfully pulled image "k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2"
   Normal  Created    59m        kubelet, 192.168.50.14  Created container nfs-client-provisioner
   Normal  Started    59m        kubelet, 192.168.50.14  Started container nfs-client-provisioner
 ```
