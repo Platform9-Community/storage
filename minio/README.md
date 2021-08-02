@@ -6,7 +6,7 @@ Following this page one can deploy a secure cloud native object storage using th
 # Prerequisites:
 
 Kubernetes:
-A descently sized platform9 managed kubernetes cluster
+A descently sized platform9 managed kubernetes cluster.
 Masters: minimum 1, 3 for HA
 Cluster nodes (Workers): 4
 Node Sizing: 4VCPUs x 16GiBs
