@@ -5,6 +5,9 @@ Following this page one can deploy a secure cloud native object storage using th
 
 # Prerequisites:
 
+
+
+```bash
 Kubernetes:
 A descently sized platform9 managed kubernetes cluster.
 Masters: minimum 1, 3 for HA
@@ -22,8 +25,8 @@ TLS certificates:
 Recommended version: v1.4.1
 
 min-IO:
-
-
+[min-IO operator](https://operator.min.io/)
+```bash
 
 # Note:
 The deployment will work with any platform9 plans. You may login with a platform9 free tier account to spin up the cluster on your private or public cloud infrastructure.
