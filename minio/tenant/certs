@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata: 
+  name: ${namespace}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ${tenant}
+  namespace: ${namespace}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ${tenant}-cert
+  namespace: ${namespace}
+spec:
+  commonName: minio-${tenant}-${namespace}
+  secretName: ${tenant}-cert
+  duration: 24h
+  renewBefore: 23h
+  dnsNames:
+    - '*.${tenant}-minio.${namespace}.svc.cluster.local'
+    - '*.${tenant}-hl.${namespace}.svc.cluster.local'
+    - '*.${namespace}.svc.cluster.local'
+    - ${tenant}.platform9.horse
+  issuerRef:
+    name: ${tenant}

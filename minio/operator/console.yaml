@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    operator.min.io/authors: MinIO, Inc.
+    operator.min.io/license: AGPLv3
+    operator.min.io/support: https://subnet.min.io
+  labels:
+    name: console
+  name: console
+  namespace: minio-operator
+spec:
+  ports:
+  - name: http
+    port: 9090
+  - name: https
+    port: 9443
+  selector:
+    app: console
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    operator.min.io/authors: MinIO, Inc.
+    operator.min.io/license: AGPLv3
+    operator.min.io/support: https://subnet.min.io
+  name: console
+  namespace: minio-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: console
+  template:
+    metadata:
+      annotations:
+        operator.min.io/authors: MinIO, Inc.
+        operator.min.io/license: AGPLv3
+        operator.min.io/support: https://subnet.min.io
+      labels:
+        app: console
+    spec:
+      containers:
+      - args:
+        - server
+        - --certs-dir=/tmp/certs        
+        env:
+        - name: CONSOLE_OPERATOR_MODE
+          value: "on"
+        image: minio/console:v0.7.4
+        imagePullPolicy: IfNotPresent
+        name: console
+        ports:
+        - containerPort: 9090
+          name: console-http
+        - containerPort: 9443
+          name: console-https
+        volumeMounts:
+          - mountPath: /tmp/certs
+            name: tls-certificates          
+      serviceAccountName: console-sa
+      volumes:
+        - name: tls-certificates
+          projected:
+            defaultMode: 420
+            sources:
+              - secret:
+                  items:
+                    - key: tls.crt
+                      path: CAs/public.crt
+                    - key: tls.crt
+                      path: public.crt
+                    - key: tls.key
+                      path: private.key
+                  name: operator-tls-tls      
+      securityContext:
+        fsGroup: 2000
+        runAsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+

@@ -68,21 +68,80 @@ With cert-managet first create a Issuer and issue a certificate.
 kubectl apply -f operator/operator-tls-tls.yaml
 ```
 
-This manifest creates minio-operator namespace, a certificate Issuer called as minio-operator and finally issues a certificate 'operator-tls-tls' from the issuer in the minio-operator namespace. Beyond this cert-manager also creates a secret with the same name that has the certificate, CA certificate and the private key file. extract the tls.crt and tls.key from the secret 'operator-tls-tls' and create a secret called as operator-tls by running following commands:
+This manifest creates minio-operator namespace, a certificate Issuer called as minio-operator and finally issues a certificate 'operator-tls-tls' from the issuer in the minio-operator namespace. Beyond this cert-manager also creates a secret with the same name that has the certificate, CA certificate and the private key file. extract the tls.crt and tls.key from the secret 'operator-tls-tls' and create a opaque type secret called as 'operator-tls' by running following commands:
 ```bash
+kubectl create secret generic operator-tls --from-file=public.crt=./tls.crt --from-file=private.key=./tls.key
+```
+Validate the secret got created.
+```bash
+$ kubectl get secret
+NAME                  TYPE                                  DATA   AGE
+default-token-gvqwp   kubernetes.io/service-account-token   3      29m
+operator-tls          Opaque                                2      13s
+operator-tls-tls      kubernetes.io/tls                     3      24m
+```
 
+Install Min-IO operator
+One can generate the Min-IO operator deployment manifest and apply in kubernetes with simple steps. 
+
+# Deploy latest operator from [Min-IO](https://operator.min.io/)
+```bash
+wget https://github.com/minio/operator/releases/download/v4.1.3/kubectl-minio_4.1.3_linux_amd64 -O kubectl-minio
+chmod +x kubectl-minio
+mv kubectl-minio /usr/local/bin/
+kubectl minio version
+kubectl minio init -o > minio_4.1.3.yaml
+kubectl apply -f minio_4.1.3.yaml
+```
+
+Optionaly you may deploy the operator from the manifest for Min-IO operator version 4.1.2 included in the repository.
+```bash
+kubectl apply -f operator/minio-operator-4.1.2.yaml
+```
+
+TLS can be enabled for the operator console with an cert-manager issued certificate and secret in the minio-operator namespace.
+```bash
+kubectl apply -f operator/console.yaml
+```
+This uses the same operator-tls-tls secret which was create for the minio-operator earlier. One may use a separate certificate for the console.
+Patch the operator service to be of the type loadbalancer.
+
+```bash
+kubectl -n minio-operator patch svc console -p '{"spec": {"type": "LoadBalancer"}}'
+```
+```bash
+$ kubectl get svc -n minio-operator
+NAME       TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                         AGE
+console    LoadBalancer   10.21.198.26   10.128.146.47   9090:30475/TCP,9443:30895/TCP   5d2h
+operator   ClusterIP      10.21.175.75   <none>          4222/TCP,4233/TCP               5d2h
+```
+Operator console will be accessible as https://LB-IP:9443 e.g. https://10.128.146.47:9443
+
+The secret can be found out with the following command:
+
+```bash
+kubectl minio proxy 
+```
+
+# Deploy Min-IO tenant with cert-manager issued certificate
+we have provided a script to deploy a tenant with a cert-manager issued certificate. The script creates a tenant namespace, certificate issuer, issues certificate for the tenant and deploys the tenant with TLS.
+
+```bash
+tenant/tenant.sh tenant-name [tenant-namespace]
+```
+tenant-name is name of the tenant
+tenant-namespace is set to tenant-name if the tenant-namespace is not specified. 
+
+After a few minutes the the minio tenant will be ready and its console will be accessible over a ClusterIP type service called 'minio'
+
+patch the tenant console service so that it can be accessed from the browser.
+```bash
+kubectl -n <tenant-name> patch svc minio -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
 
 
 
-
-```bash
-
-```
-```bash
-
-```
 
 Install [rook](https://github.com/Platform9-Community/csi/tree/master/rook) CSI driver. Follow steps till rook-ceph cluster creation. Apply the manifest provided in this [repository](repo/rook/4-storageclass.waitforfirstconsumer.yaml) to deploy the storage class. If this fails to allocate volumes then an alternate storage class yaml is also provided in the same [repository](repo/rook/4-storageclass-immediate.yaml).
 
@@ -95,132 +154,3 @@ kubectl get sc
 NAME                        PROVISIONER                  RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 rook-ceph-block (default)   rook-ceph.rbd.csi.ceph.com   Delete          Immediate           true                   4d3h
 ```
-
-
-One can validate ceph cluster status from the toolbox pod as shown below
-
-```bash
-$ kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" \
-  -o jsonpath='{.items[0].metadata.name}') bash
-
-[root@worker03 /]# ceph status
-  cluster:
-    id:     bd07342c-5dc3-4565-ab3e-cd70de7dfd83
-    health: HEALTH_WARN
-            too few PGs per OSD (8 < min 30)
-
-  services:
-    mon: 3 daemons, quorum a,b,d (age 68m)
-    mgr: a(active, since 46s)
-    osd: 3 osds: 3 up (since 63m), 3 in (since 63m)
-
-  data:
-    pools:   1 pools, 8 pgs
-    objects: 6 objects, 35 B
-    usage:   3.0 GiB used, 54 GiB / 57 GiB avail
-    pgs:     8 active+clean
-
-[root@worker03 /]# ceph osd tree
-ID CLASS WEIGHT  TYPE NAME              STATUS REWEIGHT PRI-AFF
--1       0.05576 root default
--3       0.01859     host 10-12-2-21
- 0   hdd 0.01859         osd.0              up  1.00000 1.00000
--7       0.01859     host 10-12-2-24
- 1   hdd 0.01859         osd.1              up  1.00000 1.00000
--5       0.01859     host 10-12-2-6
- 2   hdd 0.01859         osd.2              up  1.00000 1.00000
-
- [root@worker03 /]# ceph osd status
-+----+------------+-------+-------+--------+---------+--------+---------+-----------+
-| id |      host  |  used | avail | wr ops | wr data | rd ops | rd data |   state   |
-+----+------------+-------+-------+--------+---------+--------+---------+-----------+
-| 0  | 10.12.2.21 | 1027M | 17.9G |    0   |     0   |    0   |     0   | exists,up |
-| 1  | 10.12.2.24 | 1027M | 17.9G |    0   |     0   |    0   |     0   | exists,up |
-| 2  |  10.12.2.6 | 1027M | 17.9G |    0   |     0   |    0   |     0   | exists,up |
-+----+------------+-------+-------+--------+---------+--------+---------+-----------+
-
-```
-
-Create a test pvc from the storageclass
-```bash
-$ kubectl apply -f csi/rook/internal-ceph/1.4.6/6-pvc.yaml
-persistentvolumeclaim/rbd-pvc configured
-```
-
-Validate the PVC is bound to a pv from rook-ceph-block storage class.
-```bash
-$ kubectl get pv,pvc
-NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM             STORAGECLASS      REASON   AGE
-persistentvolume/pvc-f5f8dd87-5361-4114-ab40-81f666646d17   1Gi        RWO            Delete           Bound    default/rbd-pvc   rook-ceph-block            65m
-
-NAME                            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
-persistentvolumeclaim/rbd-pvc   Bound    pvc-f5f8dd87-5361-4114-ab40-81f666646d17   1Gi        RWO            rook-ceph-block   122m
-```
-
-The Storage Class will also be visible in the PMK UI
-
-![sc_ui](https://github.com/KoolKubernetes/csi/blob/master/rook/images/sc_ui.png)
-
-
-# Enabling CSI Snapshot functionality
-
-There are certain use-cases where you need volume Snapshot functionality and you need to have `volumesnapshotclasses`,`volumesnapshotcontents` and `volumesnapshots`  objects present on the cluster.
-
-
-This can be implemented by running the following commands.
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/master/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
-```
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/master/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
-```
-
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/master/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
-```
-
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/master/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
-```
-
-```bash
-kubectl apply -f https://github.com/kubernetes-csi/external-snapshotter/blob/master/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
-```
-
-
-Finally, we'll deploy the Snapshot class that's needed for creating Volume Snapshots -
-
-```bash
-kubectl apply -f csi/rook/internal-ceph/1.4.6/8-snapshot-class.yaml
-```
-
-Now let's test the volumeSnapshot creation and restore by creating a test volumeSnapshot. If you have not already created a test snapshot as mentioned earlier, run the following command to create it -
-
-
-```bash
-kubectl apply -f csi/rook/internal-ceph/1.4.6/6-pvc.yaml
-```
-
-Next, create a snapshot by running the following command -
-
-```bash
-kubectl apply -f csi/rook/internal-ceph/1.4.6/9-volume-snapshot.yaml
-```
-
-
-Ensure that you're able to observe the volume snapshot in the following command -
-```bash
-kubectl get volumesnapshots
-```
-
-Now, lets restore the snapshot -
-
-```bash
-kubectl apply -f 10-volume-snapshot-restore.yaml
-```
-
-You should now be able to observe both the pv and the associated snapshots.
