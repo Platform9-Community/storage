@@ -1,5 +1,5 @@
 ## MinIO Operator for Kubernetes
-
+## DRAFT
 # Running a secure cloud-native object storage with platform9 kubernets and MinIO object storage
 Following this page one can deploy a secure cloud native object storage using the most recent MinIO operator on platform9 managed kubernetes cluster. 
 
@@ -26,7 +26,7 @@ Recommended version: v1.4.1
 
 min-IO:
 [min-IO operator](https://operator.min.io/)
-```bash
+```
 
 # Note:
 The deployment will work with any platform9 plans. You may login with a platform9 free tier account to spin up the cluster on your private or public cloud infrastructure.
