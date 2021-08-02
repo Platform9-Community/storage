@@ -161,7 +161,26 @@ kubectl -n <tenant-name> patch svc minio -p '{"spec": {"type": "LoadBalancer"}}'
 
 Validation:
 ```bash
-kubectl get pods -n tenant7
+kubectl get pods,svc,secret -n tenant6
+NAME                                   READY   STATUS    RESTARTS   AGE
+pod/tenant6-console-755fcf44b5-568vw   1/1     Running   0          4d1h
+pod/tenant6-console-755fcf44b5-z8259   1/1     Running   0          4d1h
+pod/tenant6-ss-0-0                     1/1     Running   0          4d1h
+pod/tenant6-ss-0-1                     1/1     Running   0          4d1h
+pod/tenant6-ss-0-2                     1/1     Running   0          4d1h
+pod/tenant6-ss-0-3                     1/1     Running   0          4d1h
 
+NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)         AGE
+service/minio             LoadBalancer   10.21.248.143   10.128.146.49   443:32625/TCP   4d1h
+service/tenant6-console   ClusterIP      10.21.28.111    <none>          9443/TCP        4d1h
+service/tenant6-hl        ClusterIP      None            <none>          9000/TCP        4d1h
+
+NAME                             TYPE                                  DATA   AGE
+secret/default-token-56xzg       kubernetes.io/service-account-token   3      4d1h
+secret/operator-tls              Opaque                                1      4d1h
+secret/operator-webhook-secret   Opaque                                3      4d1h
+secret/tenant6-cert              kubernetes.io/tls                     3      4d1h
+secret/tenant6-console-secret    Opaque                                4      4d1h
+secret/tenant6-creds-secret      Opaque                                2      4d1h
 ```
 
