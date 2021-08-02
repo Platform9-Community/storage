@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata: 
+  name: minio-operator
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: minio-operator
+  namespace: minio-operator
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: operator-tls-tls
+spec:
+  commonName: minio.platform9.horse
+  secretName: operator-tls-tls
+  dnsNames:
+    # Ingress domain
+    # - minio.domain.name
+    # Internal domain
+    - operator
+    - *.operator.minio-operator.svc.cluster.local
+    - operator.minio-operator.svc
+    - operator-minio.platform9.horse
+  issuerRef:
+    name: minio-operator
+...
