@@ -156,7 +156,7 @@ After a few minutes the the minio tenant will be ready and its console will be a
 
 patch the tenant console service so that it can be accessed from the browser.
 ```bash
-kubectl -n <tenant-name> patch svc minio -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc minio -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
 Validation:
