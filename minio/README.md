@@ -194,10 +194,10 @@ pod/tenant6-ss-0-1                     1/1     Running   0          4d1h
 pod/tenant6-ss-0-2                     1/1     Running   0          4d1h
 pod/tenant6-ss-0-3                     1/1     Running   0          4d1h
 
-NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)         AGE
-service/minio             LoadBalancer   10.21.248.143   10.128.146.49   443:32625/TCP   4d1h
-service/tenant6-console   ClusterIP      10.21.28.111    <none>          9443/TCP        4d1h
-service/tenant6-hl        ClusterIP      None            <none>          9000/TCP        4d1h
+NAME              TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)          AGE
+minio             LoadBalancer   10.21.80.216    10.128.146.49   443:32037/TCP    5d6h
+tenant1-console   LoadBalancer   10.21.118.112   10.128.146.19   9443:31226/TCP   5d6h
+tenant1-hl        ClusterIP      None            <none>          9000/TCP         5d6h
 
 NAME                             TYPE                                  DATA   AGE
 secret/default-token-56xzg       kubernetes.io/service-account-token   3      4d1h
@@ -207,4 +207,8 @@ secret/tenant6-cert              kubernetes.io/tls                     3      4d
 secret/tenant6-console-secret    Opaque                                4      4d1h
 secret/tenant6-creds-secret      Opaque                                2      4d1h
 ```
+The tenant console is vizualized as follows:
 
+![minio-tenant-console](https://github.com/Platform9-Community/storage/blob/master/minio/images/minio-tenant-console.png)
+
+References:
