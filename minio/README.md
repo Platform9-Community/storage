@@ -209,3 +209,4 @@ The tenant console is vizualized as follows:
 ![minio-tenant-console](https://github.com/Platform9-Community/storage/blob/master/minio/images/minio-tenant-console.png)
 
 References:
+https://github.com/minio/operator
