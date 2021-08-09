@@ -34,7 +34,7 @@ Masters: minimum one node, three nodes are recommended for HA
 Cluster nodes (Workers): Minimum four nodes
 Node Sizing: 4VCPUs x 16GiBs per node
 Disks: 1 x 100GiB for O.S. and 1 x 30GiB for CSI block storage on every worker node.
-Persistent Storage: Any pre-configured kubenetes CSI on the cluster will be enough to allocate persistent volumes to the MinIO tenants. Please refer the platform9 community [page](https://github.com/Platform9-Community/csi/tree/master/rook) in order to setup up a persistent storage with rook on platform9 managed kubernetes.
+Persistent Storage: Any pre-configured kubenetes CSI on the cluster will be enough to allocate persistent volumes to the MinIO tenants. 
 Kubernetes Version: 1.20
 Platform9 management plane version: 5.2+
 For a bare minimum configuration nodes with 2VCPUs and 4GB memory will be sufficient. One should be able to provision one or two min-IO tenants on such cluster.
@@ -46,6 +46,7 @@ MinIO operator: 4.1.2+
 ```
 # Note:
 The deployment will work with any of the platform9 plans. You may login with a platform9 [free tier](https://platform9.com/signup/) account to spin up a free kubernetes cluster on your private or public cloud infrastructure.
+Please refer the platform9 community [page](https://github.com/Platform9-Community/csi/tree/master/rook) in order to setup up a persistent storage with rook on platform9 managed kubernetes.
 
 # Deploy Rook-ceph CSI on your cluster
 If you do not have an existing CSI configured, install [rook](https://github.com/Platform9-Community/csi/tree/master/rook) CSI on your platform9 cluster. After the rook-ceph cluster gets configured apply the manifest provided in this [repository](https://raw.githubusercontent.com/Platform9-Community/storage/master/minio/rook/4-storageclass-immediate.yaml) to deploy the storage class. If this storageclass fails to allocate volumes during tenant creation, an alternate storage class yaml is also provided in the same [repository](https://github.com/Platform9-Community/storage/blob/master/minio/rook/4-storageclass.waitforfirstconsumer.yaml).
@@ -163,7 +164,7 @@ kubectl minio proxy
 ```
 
 Operator console will be accessible as https://LB-IP:9443 e.g. https://10.128.146.47:9443
-![sc_ui](https://github.com/KoolKubernetes/csi/blob/master/rook/images/sc_ui.png)
+![minio-operator-console](https://github.com/Platform9-Community/storage/blob/master/minio/images/minio-operator-console.png)
 
 # Deploy Min-IO tenant with cert-manager issued certificate
 we have provided a script to deploy a tenant with a cert-manager issued certificate. The script creates a tenant namespace, certificate issuer, issues certificate for the tenant and deploys the tenant with TLS.
