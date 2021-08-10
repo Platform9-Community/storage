@@ -20,6 +20,8 @@ metadata:
 spec:
   commonName: minio-${tenant}-${namespace}
   secretName: ${tenant}-cert
+  duration: 24h
+  renewBefore: 23h
   dnsNames:
     - '*.${tenant}-minio.${namespace}.svc.cluster.local'
     - '*.${tenant}-hl.${namespace}.svc.cluster.local'
