@@ -3,43 +3,48 @@
 
 MinIO is a cloud native and cloud agnostic object storage solution. It is compatible with amazon S3.  Deploying a tenant to create object storage buckets is simple, fast and efficient with MinIO. MinIO gives storage software as a service experience.
 
-MinIO can be used for a number of applications. It can greatly benefit as an object storage backend for artifact storage. From container registry to CICD minIO serves the purpose of s3 integration. As kubernetes is becoming popular in the fields of Artificial intelligence, machine learning and analytics, so are these applications getting benefited by storing files on object storage like MinIO. MinIO is suitable for such use cases as it gives the necessary performance on top of simple to consume and simple to integrate hardware configurations. 
+MinIO can be used for a number of applications. It can greatly benefit as an object storage backend for artifact storage. From container registry to CICD minIO serves the purpose of s3 integration. As kubernetes is becoming popular in the fields of Artificial intelligence, machine learning and analytics, so are these applications getting benefited by storing files on object storage like MinIO. MinIO is suitable for such use cases as it gives the necessary performance on top of simple to consume and simple to integrate hardware configurations.
 
 Most of the kubernetes backup and recovery solutions are compatible with S3 that makes minIO a perfect fit for storing kubernetes backups as well. Hence commonly used backup solutions like velero and many more seamlessly integrate with MinIO.
 
 MinIO can be integrated into kubernetes with ease. Maintenance is simple and easy. This eases the operational complexities. MinIO recently has come up with an operator that can manage multiple MinIO tenants in a kubernetes cluster. Operator has its own console from where one can manage the tenants. Tenants can be either provisioned via operator-console or via tenant manifest although all options for MinIO tenant are available in the tenant deployment via manifest. The tenant deployment on kubernetes is extremely easy. It supports integration with cert-manager using kubernetes TLS type secret to access the tenant and buckets via s3 client over HTTPS.
 
-A tenant can be deployed into an application's microservice namespace. MinIO tenant runs as a stateful set with headless service in its namespace. Only one MinIO tenant is allowed per namespace. A tenant has its own console and service that can be used to visualize the tenant's performance via prometheus integration and manage the tenant features and S3 buckets. This reduces the operational complexities involved in managing the tenants. The tenant can be integrated with Active Directory or OpenID for authentication. By default the authentication is integrated with kubernetes opaque secret.
+A tenant can be deployed into an application’s microservice namespace. MinIO tenant runs as a stateful set with headless service in its namespace. Only one MinIO tenant is allowed per namespace. A tenant has its own console and service that can be used to visualize the tenant's performance via prometheus integration and manage the tenant features and S3 buckets. This reduces the operational complexities involved in managing the tenants. The tenant can be integrated with Active Directory or OpenID for authentication. By default the authentication is integrated with kubernetes opaque secret.
 
-MinIO operator is simple to configure on kubernetes. The Operator has a console to manage tenants, License and visualize the storage used by minIO tenants. 
+MinIO operator is simple to configure on kubernetes. The Operator has a console to manage tenants, License and visualize the storage used by minIO tenants.
 
 Another great feature is standard license costs only upto 10PBs and anything above 10PB is not charged. Similarly Enterprise license charges only upto 5PBs and anything above 5PB is not charged. The capacity report can be easily shared with MinIO from time to time.
 
+
 # How to deploy minio on platform9 managed kubernetes:
-One has to first deploy the minio-operator which then can deploy the minio tenant into a kubernetes namespaces. For production grade deployment it is recommended to integrate minio-Tenant with OpenID authentication and integrate Prometheus. Also leverage kubernetes TLS type secrets for accessing both the tenant and operator. Integration with cert-manager makes it simple to manage and rotate the TLS certificates for the minIO pods. MinIO tenant pods in the tenant stateful sets have to be restarted in the event of rotation of TLS certificate. 
+One has to first deploy the minio-operator which then can further deploy the minio tenant into a kubernetes namespaces. For production grade deployment it is recommended to integrate minio-Tenant with OpenID authentication and integrate Prometheus. Also leverage kubernetes TLS type secrets for accessing both the tenant and operator. Integration with cert-manager makes it simple to manage and rotate the TLS certificates for the minIO pods. MinIO tenant pods in the tenant stateful sets have to be restarted in the event of rotation of TLS certificate.
 
 As of now rotation of operator-tls certificate is manual so it should have a sufficiently longer lifespan acceptable to your organization.
 
+As of now MinIO pods do not support vault integration for storing secrets.
+
 One can install MinIO on platform9 managed kubernetes to quickly test MinIO with their choice of application following these steps:
+
 
 # Prerequisites:
 
 ```bash
-Kubernetes:
+Kubernetes sizing:
 A decently sized platform9 managed kubernetes cluster.
 Masters: minimum one node, three nodes are recommended for HA
 Cluster nodes (Workers): Minimum four nodes
 Node Sizing: 4VCPUs x 16GiBs per node
 Disks: 1 x 100GiB for O.S. and 1 x 30GiB for CSI block storage on every worker node.
-Persistent Storage: Any pre-configured kubernetes CSI on the cluster will be enough to allocate persistent volumes to the MinIO tenants. 
+Persistent Storage: Any pre-configured kubernetes CSI on the cluster will be enough to allocate persistent volumes to the MinIO tenants.
 Kubernetes Version: 1.20
 Platform9 management plane version: 5.2+
 For a bare minimum configuration nodes with 2VCPUs and 4GB memory will be sufficient. One should be able to provision one or two min-IO tenants on such clusters.
 On your on-premise setups configure metallb to access the min-IO operator and tenant consoles over the loadbalancer type service. MinIO tenants can also be exposed via an ingress controller.
 
-Recommended software versions: 
+Recommended software versions:
 Cert-manager: v1.4.1+
 MinIO operator: 4.1.2+
+
 ```
 # Note:
 The deployment will work with any of the platform9 plans. You may login with a platform9 [free tier](https://platform9.com/signup/) account to spin up a free kubernetes cluster on your private or public cloud infrastructure.
