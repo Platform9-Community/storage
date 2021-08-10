@@ -208,5 +208,29 @@ The tenant console is vizualized as follows:
 
 ![minio-tenant-console](https://github.com/Platform9-Community/storage/blob/master/minio/images/minio-tenant-console.png)
 
+Note that operator-tls certificate has to be reissued upon expiry or before and udpdated with new TLS certificate and key into the minio-operator namespace and all tenant namespaces.
+
+The kubernetes TLS type secrets in the tenant namespaces are auto rotated by cert-manager but the MinIO pods in the tenant namespace have to be recycled in order to consume them. To do that run the following commands in the tenant namespace:
+To restart the statefulset pods run:
+
+```bash
+tenant="YOUR-TENANT-NAME"
+```
+
+```bash
+ kubectl rollout restart sts/${tenant}-ss-0 -n ${tenant}
+```
+
+To restart the console deployment pods run:
+
+```bash
+tenant="YOUR-TENANT-NAME"
+```
+
+```bash
+ kubectl rollout restart deployment/${tenant}-console -n ${tenant}
+```
+
 References:
 https://github.com/minio/operator
+https://subnet.min.io
