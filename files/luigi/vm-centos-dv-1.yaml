@@ -1,0 +1,53 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  labels:
+    kubevirt.io/vm: vm-centos-dv-1
+  name: vm-centos-dv-1
+spec:
+  running: true
+  dataVolumeTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: centos-dv-1
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20G
+        storageClassName: rook-ceph-block
+      source:
+        http:
+          url: http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: vm-centos-dv-1
+    spec:
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: datavolume-1
+          - disk:
+              bus: virtio
+            name: cloudinit
+        machine:
+          type: ""
+        resources:
+          requests:
+            memory: 2G
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - dataVolume:
+          name: centos-dv-1
+        name: datavolume-1
+      - cloudInitNoCloud:
+          userData: |
+            password: Passw0rd123
+            chpasswd: { expire: False }
+        name: cloudinit

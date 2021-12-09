@@ -1,0 +1,10 @@
+apiVersion: plumber.k8s.pf9.io/v1
+kind: NetworkPlugins
+metadata:
+  name: networkplugins
+spec:
+  plugins: 
+    hostPlumber: {}
+    nodeFeatureDiscovery: {}
+    multus: {}
+    whereabouts: {}
