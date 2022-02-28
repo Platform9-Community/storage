@@ -194,6 +194,7 @@ endif
 		--from-backup $(BACKUP_NAME) \
 		--include-resources=* \
 		--include-cluster-resources \
+		--exclude-namespaces=$(VELERO_NAMESPACE),$(MINIO_NAMESPACE),$(IGNORE) \
 		--preserve-nodeports=true \
 		--kubecontext $(DEST_KUBE_CONTEXT) \
 		--kubeconfig $(DEST_KUBECONFIG)
