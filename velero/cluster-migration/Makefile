@@ -18,6 +18,9 @@ IGNORE_NAMESPACES=kube-node-lease \
 	pf9-olm \
 	pf9-operators \
 	platform9-system
+APP_LABELS=one \
+	   two \
+	   three
 SRC_CLUSTER_NAME = source-cluster
 DEST_CLUSTER_NAME = dest-cluster
 VELERO_NAMESPACE = velero
@@ -180,7 +183,7 @@ backup:
 		--kubecontext $(SRC_KUBE_CONTEXT) \
 		--kubeconfig $(SRC_KUBECONFIG)
 
-restore:
+restore_all:
 ifeq ($(BACKUP_NAME),undef)
 	@echo "Specify the backup name. ie. \`BACKUP_NAME=source-cluster-xxxx make restore\`"
 	exit 1
@@ -198,6 +201,26 @@ endif
 		--preserve-nodeports=true \
 		--kubecontext $(DEST_KUBE_CONTEXT) \
 		--kubeconfig $(DEST_KUBECONFIG)
+
+restore_only_apps:
+ifeq ($(BACKUP_NAME),undef)
+	@echo "Specify the backup name. ie. \`BACKUP_NAME=source-cluster-xxxx make restore_only_apps\`"
+	exit 1
+endif
+	$(eval IGNORE = $(shell echo "$(IGNORE_NAMESPACES)" | sed -e 's/\s\+/,/g'))
+	$(eval RESTORE_TIME = $(shell date +%F-%s))
+	$(eval RESTORE_NAME = $(DEST_CLUSTER_NAME)-$(RESTORE_TIME))
+	@echo "========================================"
+	@echo "Backup Name to Restore From: $(BACKUP_NAME)"
+	for label in $(APP_LABELS); do \
+		echo "Restoring app label=$$label" ; \
+		./velero create restore "$(RESTORE_NAME)-$$label" \
+			--from-backup $(BACKUP_NAME) \
+			--selector "app.kubernetes.io/component=$$label" \
+			--preserve-nodeports=true \
+			--kubecontext $(DEST_KUBE_CONTEXT) \
+			--kubeconfig $(DEST_KUBECONFIG) ; \
+	done
 
 get_backups:
 	./velero get backups \

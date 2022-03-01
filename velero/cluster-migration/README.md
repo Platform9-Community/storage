@@ -71,9 +71,16 @@ Look at a backup's logs:
 BACKUP_NAME=a_backup_name make get_backup
 ```
 
-Restore a backup to the Destination Cluster:
+Restore an entire backup to the Destination Cluster:
 ```bash
-BACKUP_NAME=a_backup_name make restore
+BACKUP_NAME=a_backup_name make restore_all
+```
+
+**Optional:** Instead of restoring an entire backup, you can also restore individual apps. In order
+to do so, edit the Makefile and add your app(s) labels one line at a time to `APP_LABELS`.
+After `APP_LABELS` is updated, you can restore them all individually to the Destination Cluster:
+```bash
+BACKUP_NAME=a_backup_name make restore_only_apps
 ```
 
 Get restores:
