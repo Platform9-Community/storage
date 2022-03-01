@@ -40,6 +40,8 @@ DEST_KUBECONFIG = /home/jmiller/Downloads/destination-cluster.yaml
 DEST_KUBE_CONTEXT = default
 ```
 
+**Note:** SRC_KUBECONFIG and DEST_KUBECONFIG do not necessarily need to be separate files.
+
 ## Installation
 
 Install minio on the Source cluster and velero on the Source and Destination clusters:
@@ -84,6 +86,17 @@ Look at a restore's logs:
 RESTORE_NAME=a_restore_name make get_restore
 ```
 
+**Note:** On the restore logs above, it is common to see innocuous Warnings like the ones below. Velero is smart
+enough not to overwrite any resources in the destination of the same name. These can be ignored.
+
+```
+Warnings:
+  Velero:     <none>
+  Cluster:  could not restore, CustomResourceDefinition "alertmanagerconfigs.monitoring.coreos.com" already exists. Warning: the in-cluster version is different than the backed-up version.
+            could not restore, CustomResourceDefinition "alertmanagers.monitoring.coreos.com" already exists. Warning: the in-cluster version is different than the backed-up version.
+            could not restore, CustomResourceDefinition "backups.velero.io" already exists. Warning: the in-cluster version is different than the backed-up version.
+            could not restore, CustomResourceDefinition "backupstoragelocations.velero.io" already exists. Warning: the in-cluster version is different than the backed-up version.
+```
 
 ## Additional Options
 
