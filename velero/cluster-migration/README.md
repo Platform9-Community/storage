@@ -144,9 +144,11 @@ Warnings:   <error getting warnings: Get "http://10.0.1.7:30673/velero/restores/
 Errors:  <error getting errors: Get "http://10.0.1.7:30673/velero/restores/dest-cluster-2022-03-22-1647977109/restore-dest-cluster-2022-03-22-1647977109-results.gz?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=xxx": dial tcp 10.0.1.7:30673: i/o timeout>
 ```
 
-If `make check_comms` succeeds without reporting any errors, this means that your local workstation
-cannot communicate over TCP/IP to the minio NodePort on the destination cluster. To resolve this
-you can simply add the NodeIP to your workstation's primary interface and use kubectl proxy to forward.
+If `make check_comms` succeeds without reporting any errors, this means that communication between
+clsuters is OK, but your local workstation cannot communicate over TCP/IP to the minio NodePort on
+the destination cluster.
+
+To resolve this you can simply add the NodeIP to your workstation's primary interface and use kubectl proxy to forward.
 
 For example, the following commands resolve the error above:
 ```bash
