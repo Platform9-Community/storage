@@ -145,7 +145,7 @@ Errors:  <error getting errors: Get "http://10.0.1.7:30673/velero/restores/dest-
 ```
 
 If `make check_comms` succeeds without reporting any errors, this means that communication between
-clsuters is OK, but your local workstation cannot communicate over TCP/IP to the minio NodePort on
+clusters is OK, but your local workstation cannot communicate over TCP/IP to the minio NodePort on
 the destination cluster.
 
 To resolve this you can simply add the NodeIP to your workstation's primary interface and use kubectl proxy to forward.
@@ -176,4 +176,4 @@ Handling connection for 30673
 To delete the IP you added run:
 ```bash
 sudo ip addr del 10.0.1.7/32 dev enp0s31f6
-```
+``
