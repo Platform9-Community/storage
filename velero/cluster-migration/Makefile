@@ -1,13 +1,14 @@
 ## YOU MUST CUSTOMIZE THESE
 ##
-SRC_KUBECONFIG = /home/jmiller/Downloads/k8s-calico.yaml
+SRC_KUBECONFIG = /home/jmiller/Downloads/test-azure-cluster.yaml
 SRC_KUBE_CONTEXT = default
-DEST_KUBECONFIG = /home/jmiller/Downloads/single-master.yaml
+DEST_KUBECONFIG = /home/jmiller/Downloads/test-azure-2.yaml
 DEST_KUBE_CONTEXT = default
 ##
 ## OPTIONALLY CUSTOMIZE THE FOLLOWING
 ##
 IGNORE_NAMESPACES=kube-node-lease \
+	kube-node-lease \
 	kube-public \
 	kube-system \
 	kubernetes-dashboard \
@@ -43,10 +44,10 @@ CREDENTIALS_FILE_PATH = ./credentials
 VELERO_CLIENT = velero
 MINIO = minio_is_installed
 TARGET ?= undef
+BACKUP_NAME ?= undef
 KUBE_CONTEXT = undef
 KUBECONFIG = undef
 MINIO_HOST = undef
-BACKUP_NAME ?= undef
 ##
 
 export VELERO_NAMESPACE MINIO_NAMESPACE MINIO_ACCESS_KEY MINIO_SECRET_KEY BUCKET_NAME \
@@ -74,11 +75,11 @@ $(VELERO_CLIENT):
 
 $(MINIO):
 	@echo "========================================"
-	@echo "Installing minio into namespace $(MINIO_NAMESPACE)"
-	@echo "using the $(SRC_KUBE_CONTEXT) kube context from $(SRC_KUBECONFIG)"
+	@echo "Installing minio into namespace $(MINIO_NAMESPACE) on Destination Cluster"
+	@echo "using the $(DEST_KUBE_CONTEXT) kube context from $(DEST_KUBECONFIG)"
 	envsubst < ./minio-velero-nodeport.yaml | kubectl \
-		--context ${SRC_KUBE_CONTEXT} \
-		--kubeconfig ${SRC_KUBECONFIG} \
+		--context ${DEST_KUBE_CONTEXT} \
+		--kubeconfig ${DEST_KUBECONFIG} \
 		apply -f -
 	touch minio_is_installed
 	@echo "========================================"
@@ -87,11 +88,11 @@ minio: $(MINIO)
 
 uninstall_minio:
 	@echo "========================================"
-	@echo "Uinstalling minio from namespace $(MINIO_NAMESPACE)"
-	@echo "using the $(SRC_KUBE_CONTEXT) kube context from $(SRC_KUBECONFIG)"
+	@echo "Uinstalling minio from namespace $(MINIO_NAMESPACE) on the Destination Cluster"
+	@echo "using the $(DEST_KUBE_CONTEXT) kube context from $(DEST_KUBECONFIG)"
 	envsubst < ./minio-velero-nodeport.yaml | kubectl \
-		--context ${SRC_KUBE_CONTEXT} \
-		--kubeconfig ${SRC_KUBECONFIG} \
+		--context ${DEST_KUBE_CONTEXT} \
+		--kubeconfig ${DEST_KUBECONFIG} \
 		delete -f - || true
 	rm -f minio_is_installed
 	@echo "========================================"
@@ -119,9 +120,9 @@ uninstall_velero: determine_velero_target
 		--namespace $(VELERO_NAMESPACE)
 
 get_node_ip:
-	@echo "Determining Node IP for NodePort.."
-	$(eval MINIO_HOST=$(shell kubectl --context $(SRC_KUBE_CONTEXT) \
-		--kubeconfig $(SRC_KUBECONFIG) \
+	@echo "Determining Node IP for NodePort on Destination Cluster"
+	$(eval MINIO_HOST=$(shell kubectl --context $(DEST_KUBE_CONTEXT) \
+		--kubeconfig $(DEST_KUBECONFIG) \
 		get nodes -o \
 		jsonpath='{ $$.items[0].status.addresses[?(@.type=="InternalIP")].address }'))
 
@@ -158,11 +159,12 @@ install_velero: $(VELERO_CLIENT) determine_velero_target get_node_ip
 		--namespace $(VELERO_NAMESPACE)
 
 check_comms: get_node_ip
+	@echo "Checking if Source Cluster can reach Minio on Destination Cluster"
 	kubectl run tmp-shell \
 		--restart=Never --rm -i --tty \
 		--image nicolaka/netshoot -n $(VELERO_NAMESPACE) \
-		--context $(DEST_KUBE_CONTEXT) \
-		--kubeconfig $(DEST_KUBECONFIG) \
+		--context $(SRC_KUBE_CONTEXT) \
+		--kubeconfig $(SRC_KUBECONFIG) \
 		-- nc -z -v -w5 $(MINIO_HOST) $(MINIO_NODEPORT)
 
 backup:
@@ -185,7 +187,7 @@ backup:
 
 restore_all:
 ifeq ($(BACKUP_NAME),undef)
-	@echo "Specify the backup name. ie. \`BACKUP_NAME=source-cluster-xxxx make restore\`"
+	@echo "Specify the backup name. ie. \`BACKUP_NAME=source-cluster-xxxx make restore_all\`"
 	exit 1
 endif
 	$(eval IGNORE = $(shell echo "$(IGNORE_NAMESPACES)" | sed -e 's/\s\+/,/g'))
@@ -221,6 +223,11 @@ endif
 			--kubecontext $(DEST_KUBE_CONTEXT) \
 			--kubeconfig $(DEST_KUBECONFIG) ; \
 	done
+
+get_backup_location:
+	./velero backup-location get \
+		--kubecontext $(SRC_KUBE_CONTEXT) \
+		--kubeconfig $(SRC_KUBECONFIG)
 
 get_backups:
 	./velero get backups \
