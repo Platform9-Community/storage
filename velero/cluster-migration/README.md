@@ -52,6 +52,7 @@ make install
 Validate that the Destination cluster can talk to Minio via NodePort
 ```bash
 make check_comms
+make get_backup_location
 ```
 
 ## Backup and Restore
@@ -133,3 +134,46 @@ Install/Re-install velero CLI (perhaps changing VELERO_CLIENT_VERSION in the Mak
 rm velero
 make velero
 ```
+
+## Troubleshooting
+
+Occasionally, you may see an error like this when querying a backup or a restore:
+```
+Warnings:   <error getting warnings: Get "http://10.0.1.7:30673/velero/restores/dest-cluster-2022-03-22-1647977109/restore-dest-cluster-2022-03-22-1647977109-results.gz?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=xxx": dial tcp 10.0.1.7:30673: i/o timeout>
+
+Errors:  <error getting errors: Get "http://10.0.1.7:30673/velero/restores/dest-cluster-2022-03-22-1647977109/restore-dest-cluster-2022-03-22-1647977109-results.gz?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=xxx": dial tcp 10.0.1.7:30673: i/o timeout>
+```
+
+If `make check_comms` succeeds without reporting any errors, this means that communication between
+clusters is OK, but your local workstation cannot communicate over TCP/IP to the minio NodePort on
+the destination cluster.
+
+To resolve this you can simply add the NodeIP to your workstation's primary interface and use kubectl proxy to forward.
+
+For example, the following commands resolve the error above:
+```bash
+[jmiller@euclid: ~/Projects/storage/velero/cluster-migration] [master|✚ 2] ✘-INT
+15:39 $ sudo ip addr add 10.0.1.7/32 dev enp0s31f6
+[jmiller@euclid: ~/Projects/storage/velero/cluster-migration] [master|✚ 2] ✔
+15:39 $ ping 10.0.1.7
+PING 10.0.1.7 (10.0.1.7) 56(84) bytes of data.
+64 bytes from 10.0.1.7: icmp_seq=1 ttl=64 time=0.049 ms
+64 bytes from 10.0.1.7: icmp_seq=2 ttl=64 time=0.039 ms
+^C
+--- 10.0.1.7 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1009ms
+rtt min/avg/max/mdev = 0.039/0.044/0.049/0.005 ms
+[jmiller@euclid: ~/Projects/storage/velero/cluster-migration] [master|✚ 2] ✔
+15:40 $ kubectl port-forward --address localhost,10.0.1.7 service/minio 30673:9000 -n minio --kubeconfig ~/Downloads/test-azure-2.yaml
+Forwarding from 10.0.1.7:30673 -> 9000
+Forwarding from 127.0.0.1:30673 -> 9000
+Forwarding from [::1]:30673 -> 9000
+Handling connection for 30673
+Handling connection for 30673
+^C
+```
+
+To delete the IP you added run:
+```bash
+sudo ip addr del 10.0.1.7/32 dev enp0s31f6
+``
