@@ -44,7 +44,7 @@ DEST_KUBE_CONTEXT = default
 
 ## Installation
 
-Install minio on the Source cluster and velero on the Source and Destination clusters:
+Install minio on the Destination cluster and velero on the Source and Destination clusters:
 ```bash
 make install
 ```
