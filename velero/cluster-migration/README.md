@@ -1,4 +1,4 @@
-# Cluster to Cluster Data Migration
+# Cluster to Cluster Migration with Velero
 
 This guide and automation will help you migrate all data from one K8s cluster to another using
 velero backup and restore.
