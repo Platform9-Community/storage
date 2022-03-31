@@ -6,7 +6,7 @@ Trident CSI supports various storage back-ends from NetApp, including ONTAP- and
 
 ## Networking
 
-If the PMK VMs have no way to reach storage services (iSCSI, NFS), follow standard host practices (whether it's vSphere, ESXi, KVM or something else) to create required networks for NFS or iSCSI. VMware hosts that use iSCSI storage [may need to add a VMkernel adapter](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.storage.doc/GUID-28C3CFF8-AE86-413F-BB58-3E00C1E3CCB6.html).
+If the PMK VMs have no way to reach storage services (iSCSI, NFS), follow standard host practices (whether it's vSphere, ESXi, KVM or something else) and create required networks for NFS or iSCSI. VMware hosts that want to use iSCSI SAN [may need to add a VMkernel adapter](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.storage.doc/GUID-28C3CFF8-AE86-413F-BB58-3E00C1E3CCB6.html) in this process.
 
 You may also follow related storage array or service information (such as NetApp ONTAP or SolidFire documentation) as well as [Trident](https://docs.netapp.com/us-en/trident/) documentation helpful. 
 
@@ -18,13 +18,15 @@ Back-end storage array, storage network and client (worker) configuration must a
 
 ## Worker configuration
 
-By default the BaseOS OVA file deployed on VMware did not come with additional NICs.
+By default the BaseOS OVA file deployed on VMware comes with single NIC.
 
-In order to allow the VM access back-end storage network - for an example iSCSI - administrator shut down the VM, add additional network adapter (or adapters) and then create NFS shares or iSCSI block devices and try to use them from worker OS *before* PMK is deployed. Temporary shares and volumes may then be removed.
+In order to allow the VM access a dedicated back-end storage network - for an example iSCSI network - administrator shut down the VM, add additional network adapter (or adapters) and configure NIC details on the host (IP address, possibly VLAN, MTU and similar details).
+
+Then create NFS shares or iSCSI block devices and try to use them from worker OS *before* PMK is deployed. Temporary shares and volumes may then be removed.
 
 ## Installation
 
-PMK administrator may build Trident from the source](https://github.com/NetApp/trident/releases) or try one of the supported installation methods (including Helm) mentioned [here](https://docs.netapp.com/us-en/trident/trident-get-started/kubernetes-deploy.html#choose-the-deployment-method).
+PMK administrator may build Trident [from the source](https://github.com/NetApp/trident/releases) or try one of the supported installation methods (including Helm) mentioned [here](https://docs.netapp.com/us-en/trident/trident-get-started/kubernetes-deploy.html#choose-the-deployment-method).
 
 Standard Trident installation steps should work without a problem (tested with PMK v1.21.3-pmk.72, Trident v22.01.1, and SolidFire 12.3).
 
