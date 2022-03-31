@@ -18,7 +18,7 @@ Back-end storage array, storage network and client (worker) configuration must a
 
 ## Worker configuration
 
-By default the BaseOS OVA file deployed on VMware comes with single NIC.
+By default the BaseOS OVA file deployed on VMware comes with a single NIC. When external storage is used best practices call for the addition of a dedicated storage network (normally at least one per storage protocol).
 
 In order to allow the VM access a dedicated back-end storage network - for an example iSCSI network - administrator shut down the VM, add additional network adapter (or adapters) and configure NIC details on the host (IP address, possibly VLAN, MTU and similar details).
 
