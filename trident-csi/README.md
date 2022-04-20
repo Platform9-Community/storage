@@ -20,9 +20,9 @@ Back-end storage array, storage network and client (worker) configuration must a
 
 By default the BaseOS OVA file deployed on VMware comes with a single NIC. When external storage is used best practices call for the addition of a dedicated storage network (normally at least one per storage protocol).
 
-In order to allow the VM access a dedicated back-end storage network - for an example iSCSI network - administrator shut down the VM, add additional network adapter (or adapters) and configure NIC details on the host (IP address, possibly VLAN, MTU and similar details).
+In order to allow worker VM(s) access a dedicated back-end storage network - for an example iSCSI network - administrator can shut down a VM, add additional VM network adapter (or adapters) and configure NIC details on the host (IP address, possibly VLAN, MTU and similar details). To lower the risk of misconfiguration, it is suggested to perform this modification serially - one worker VM at a time. The Trident documentation has a list of steps necessary for Ubuntu Linux.
 
-Then create NFS shares or iSCSI block devices and try to use them from worker OS *before* PMK is deployed. Temporary shares and volumes may then be removed.
+Then create NFS shares or iSCSI block devices and try to access and use them from worker OS *before* PMK is deployed. Temporary shares and volumes may then be removed.
 
 ## Installation
 
