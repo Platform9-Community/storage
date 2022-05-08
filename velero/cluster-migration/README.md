@@ -14,7 +14,7 @@ Linux or MacOS (workstation) node with:
 1. access to the K8S API of both Source and Destination clusters to run `kubectl` commands
 
 A Platform9 Managed Kubernetes cluster with same K8s version as Source cluster for data migration. This
-cluster would be as identical as possible as the Source cluster.
+cluster would be as identical as possible as the Source cluster, but this is not strictly necessary.
 
 ## Setup
 
