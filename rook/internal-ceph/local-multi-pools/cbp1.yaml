@@ -1,0 +1,20 @@
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: pool-ssd-set1
+  namespace: rook-ceph 
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+    requireSafeReplicaSize: true
+  deviceClass: ssd-set1
+  parameters:
+    compression_mode: none
+  mirroring:
+    enabled: false
+    mode: image
+  statusCheck:
+    mirror:
+      disabled: false
+      interval: 60s

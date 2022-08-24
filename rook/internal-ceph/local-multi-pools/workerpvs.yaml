@@ -1,0 +1,72 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local3-0
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: 18Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  # PV for mon must be a filesystem volume.
+  volumeMode: Block
+  local:
+    path: /dev/vdb
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - 10.128.147.209
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local3-1
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: 18Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  # PV for mon must be a filesystem volume.
+  volumeMode: Block
+  local:
+    path: /dev/vdc
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - 10.128.147.209
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local3-2
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: 18Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  # PV for mon must be a filesystem volume.
+  volumeMode: Block
+  local:
+    path: /dev/vdd
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - 10.128.147.209
