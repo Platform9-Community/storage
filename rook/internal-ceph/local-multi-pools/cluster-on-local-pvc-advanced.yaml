@@ -15,6 +15,35 @@ metadata:
   name: rook-ceph
   namespace: rook-ceph
 spec:
+  placement:
+    mon:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: ceph-mon
+              operator: In
+              values:
+              - "true"
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+#    osd:
+#      nodeAffinity:
+#        requiredDuringSchedulingIgnoredDuringExecution:
+#          nodeSelectorTerms:
+#          - matchExpressions:
+#            - key: storage-node
+#              operator: In
+#              values:
+#              - "true"
+#      tolerations:
+#      - key: node-role.kubernetes.io/master
+#        operator: Exists
+    mgr:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
   dataDirHostPath: /var/lib/rook
   mon:
     count: 3
@@ -51,6 +80,9 @@ spec:
                       operator: In
                       values:
                         - true
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
         resources:
           limits:
             cpu: "500m"
@@ -86,6 +118,9 @@ spec:
                       operator: In
                       values:
                         - true
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
         resources:
         volumeClaimTemplates:
           - metadata:
