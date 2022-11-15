@@ -96,7 +96,7 @@ kubectl apply -f cert-manager/test-resources.yaml
 
 Validate certificate has been issued. At this point the cert-manager is ready for issuing the certificates. 
 ```bash
-kubectl describe certificate selfsigned-cert
+kubectl get certificates -n cert-manager-test
 ```
 
 With cert-manager one can create certificate issuer under namespace as well as at the cluster level. Here we are going to keep the inssuer's scope specific to the namespace.
