@@ -26,6 +26,7 @@ spec:
     # Internal domain
     - operator
     - "*.operator.minio-operator.svc.cluster.local"
+    - operator.minio-operator.svc.cluster.local
     - operator.minio-operator.svc
     - operator-minio.platform9.horse
   issuerRef:
