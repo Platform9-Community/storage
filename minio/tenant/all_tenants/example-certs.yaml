@@ -27,5 +27,8 @@ spec:
     - '*.tenant7-hl.tenant7.svc.cluster.local'
     - '*.tenant7.svc.cluster.local'
     - tenant7.platform9.horse
+    - minio.tenant7
+    - minio.tenant7.svc
+    - minio.tenant7.svc.cluster.local
   issuerRef:
     name: tenant7
